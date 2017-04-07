@@ -5,7 +5,7 @@
 #include <QFile>
 #include <QString>
 #include <QtGlobal>
-#include <QVector>
+#include <vector>
 
 #include "myimage.hpp"
 #include "predictor.hpp"
@@ -25,9 +25,9 @@ QByteArray readBinary(const char* name, QString path) {
     return file.readAll();
 }
 
-QVector<QString> readSynsets(QString path) {
+std::vector<QString> readSynsets(QString path) {
     QFile file(path);
-    QVector<QString> result;
+    std::vector<QString> result;
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qFatal("Could not open synset file");
@@ -36,7 +36,9 @@ QVector<QString> readSynsets(QString path) {
 
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
-        result.append(QString::fromUtf8(line.data()));
+        auto lineS = QString::fromUtf8(line.data());
+        lineS.remove(0, 10);
+        result.push_back(lineS);
     }
 
     return result;
@@ -64,6 +66,15 @@ Predictor::Predictor(QString pathPrefix, DevType dt, int dev_id) {
     auto paramFile = readBinary(paramName, paramsPath);
     auto synsets = readSynsets(synsetPath);
 
+    this->symbolFile = symbolFile;
+    this->paramFile = paramFile;
+    this->synsets = synsets;
+    this->dev_type = dev_type;
+    this->dev_id = dev_id;
+}
+
+
+std::vector<std::pair<float,QString>> Predictor::getPredictions(std::vector<mx_float> image_data, int n) {
     mx_uint num_input_nodes = 1;  // 1 for feedforward
     const char* input_key[1] = {"data"};
     const char** input_keys = input_key;
@@ -72,42 +83,30 @@ Predictor::Predictor(QString pathPrefix, DevType dt, int dev_id) {
                                         static_cast<mx_uint>(MyImage::channels),
                                         static_cast<mx_uint>(MyImage::width),
                                         static_cast<mx_uint>(MyImage::height) };
-
-    PredictorHandle pred_hnd = 0;
+    PredictorHandle handle = 0;
 
     MXPredCreate(
-                symbolFile.constData(),
-                paramFile.constData(),
-                static_cast<size_t> (paramFile.length()),
-                dev_type,
-                dev_id,
+                this->symbolFile.constData(),
+                this->paramFile.constData(),
+                static_cast<size_t> (this->paramFile.length()),
+                this->dev_type,
+                this->dev_id,
                 num_input_nodes,
                 input_keys,
                 input_shape_indptr,
                 input_shape_data,
-                &pred_hnd
+                &handle
                 );
 
-    assert(pred_hnd);
+    assert(handle);
 
-    this->handle = pred_hnd;
-}
-
-Predictor::~Predictor() {
-    MXPredFree(this->handle);
-}
-
-
-void Predictor::getPredictions(MyImage im) {
     mx_uint output_index = 0;
     mx_uint *shape = 0;
     mx_uint shape_len;
 
-    auto image_data = im.asVector();
-
-    MXPredSetInput(this->handle, "data", image_data.data(), MyImage::size);
-    MXPredForward(this->handle);
-    MXPredGetOutputShape(this->handle, output_index, &shape, &shape_len);
+    MXPredSetInput(handle, "data", image_data.data(), MyImage::size);
+    MXPredForward(handle);
+    MXPredGetOutputShape(handle, output_index, &shape, &shape_len);
 
     size_t size = 1;
     for (mx_uint i = 0; i < shape_len; ++i) {
@@ -116,9 +115,21 @@ void Predictor::getPredictions(MyImage im) {
 
     std::vector<float> data(size);
 
-    MXPredGetOutput(this->handle, output_index, &(data[0]), size);
+    MXPredGetOutput(handle, output_index, &(data[0]), size);
+    MXPredFree(handle);
+
+    auto result = std::vector<std::pair<float,QString>>(n);
 
     for ( int i = 0; i < static_cast<int>(data.size()); i++ ) {
-            printf("Accuracy[%d] = %.8f\n", i, data[i]);
+        auto val = data[i];
+
+        for (int j = 0; j < static_cast<int>(result.size()); j++) {
+            if (val > std::get<float>(result[j])) {
+                result[j] = std::make_pair(val, this->synsets[i]);
+                break;
+            }
+        }
     }
+
+    return result;
 }

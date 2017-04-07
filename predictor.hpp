@@ -4,7 +4,7 @@
 #include <mxnet/c_predict_api.h>
 #include <QByteArray>
 #include <QString>
-#include <QVector>
+#include <vector>
 
 #include <myimage.hpp>
 
@@ -13,10 +13,17 @@ enum class DevType { cpu, gpu };
 class Predictor {
 public:
     Predictor(QString pathPrefix, DevType dt, int dev_id);
-    ~Predictor();
-    void getPredictions(MyImage im);
+    std::vector<std::pair<float,QString>> getPredictions(std::vector<mx_float> image_data, int n);
 private:
-    PredictorHandle handle;
+    QByteArray symbolFile;
+    QByteArray paramFile;
+    std::vector<QString> synsets;
+    int dev_type;
+    int dev_id;
+    mx_uint num_input_nodes;
+    char** input_keys;
+    mx_uint input_shape_indptr[2];
+    mx_uint input_shape_data[4];
 };
 
 #endif // PREDICTOR_HPP

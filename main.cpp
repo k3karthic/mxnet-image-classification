@@ -7,10 +7,15 @@
 int main(int argc, char *argv[])
 {
     MyImage im;
-    im.loadImage("sample.jpg");
+    auto im_data = im.processImage("sample.jpg");
 
     Predictor p("model", DevType::cpu, 0);
-    p.getPredictions(im);
+    auto result = p.getPredictions(im_data, 5);
+
+    for (int j = 0; j < static_cast<int>(result.size()); j++) {
+        auto x = result[j];
+        std::cout << QString::number(std::get<float>(x), 'g', 2).toUtf8().constData() << " " << std::get<QString>(x).toUtf8().constData();
+    }
 
     return 0;
 }
