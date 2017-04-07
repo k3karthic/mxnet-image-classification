@@ -1,23 +1,22 @@
 #ifndef PREDICTOR_HPP
 #define PREDICTOR_HPP
 
+#include <mxnet/c_predict_api.h>
 #include <QByteArray>
 #include <QString>
 #include <QVector>
 
-#include "myimage.hpp"
+#include <myimage.hpp>
 
 enum class DevType { cpu, gpu };
 
 class Predictor {
 public:
-    Predictor(QString pathPrefix, DevType dt, int dev_id, MyImage im);
+    Predictor(QString pathPrefix, DevType dt, int dev_id);
+    ~Predictor();
+    void getPredictions(MyImage im);
 private:
-    int dev_type;
-    int dev_id;
-    QByteArray symbolFile;
-    QByteArray paramFile;
-    QVector<QString> synsets;
+    PredictorHandle handle;
 };
 
 #endif // PREDICTOR_HPP

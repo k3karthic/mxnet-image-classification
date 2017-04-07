@@ -9,7 +9,8 @@ int main(int argc, char *argv[])
     MyImage im;
     im.loadImage("sample.jpg");
 
-    Predictor p("model", DevType::cpu, 0, im);
+    Predictor p("model", DevType::cpu, 0);
+    p.getPredictions(im);
 
     return 0;
 }
