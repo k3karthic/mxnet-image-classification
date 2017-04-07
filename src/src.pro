@@ -4,9 +4,12 @@
 #
 #-------------------------------------------------
 
-QT       += testlib
+include(../defaults.pri)
 
-QT       -= gui
+QT += core
+QT -= gui
+
+CONFIG += c++11
 
 TARGET = mxnet_predict
 TEMPLATE = lib
@@ -39,16 +42,16 @@ unix {
 
 ## Link MXNet library
 
-unix|win32: LIBS += -L$$PWD/../3rdparty/mxnet/lib/ -llibmxnet
+unix|win32: LIBS += -L$$PWD/../../3rdparty/mxnet/lib/ -llibmxnet
 
-INCLUDEPATH += $$PWD/../3rdparty/mxnet/include
-DEPENDPATH += $$PWD/../3rdparty/mxnet/include
+INCLUDEPATH += $$PWD/../../3rdparty/mxnet/include
+DEPENDPATH += $$PWD/../../3rdparty/mxnet/include
 
 ## Link OpenCV library
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../3rdparty/opencv/build/x64/vc14/lib/ -lopencv_core2413 -lopencv_highgui2413 -lopencv_imgproc2413
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../3rdparty/opencv/build/x64/vc14/lib/ -lopencv_core2413d -lopencv_highgui2413d -lopencv_imgproc2413d
-else:unix: LIBS += -L$$PWD/../3rdparty/opencv/build/x64/vc14/lib/ -lopencv_core2413 -lopencv_highgui2413 -lopencv_imgproc2413
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../3rdparty/opencv/build/x64/vc14/lib/ -lopencv_core2413 -lopencv_highgui2413 -lopencv_imgproc2413
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../3rdparty/opencv/build/x64/vc14/lib/ -lopencv_core2413d -lopencv_highgui2413d -lopencv_imgproc2413d
+else:unix: LIBS += -L$$PWD/../../3rdparty/opencv/build/x64/vc14/lib/ -lopencv_core2413 -lopencv_highgui2413 -lopencv_imgproc2413
 
-INCLUDEPATH += $$PWD/../3rdparty/opencv/build/include
-DEPENDPATH += $$PWD/../3rdparty/opencv/build/include
+INCLUDEPATH += $$PWD/../../3rdparty/opencv/build/include
+DEPENDPATH += $$PWD/../../3rdparty/opencv/build/include
