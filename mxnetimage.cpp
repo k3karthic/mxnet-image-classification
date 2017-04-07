@@ -5,7 +5,7 @@
 #include <QtGlobal>
 #include <vector>
 
-#include "myimage.hpp"
+#include "mxnetimage.hpp"
 
 //
 // Implementation

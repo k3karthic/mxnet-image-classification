@@ -1,5 +1,4 @@
 #include <cassert>
-#include <cstdio>
 #include <mxnet/c_predict_api.h>
 #include <QDir>
 #include <QFile>
@@ -7,8 +6,8 @@
 #include <QtGlobal>
 #include <vector>
 
-#include "myimage.hpp"
-#include "predictor.hpp"
+#include "mxnetimage.hpp"
+#include "mxnetpredict.hpp"
 
 //
 // Helper Functions
@@ -48,7 +47,7 @@ std::vector<QString> readSynsets(QString path) {
 // Implementation
 //
 
-Predictor::Predictor(QString pathPrefix, DevType dt, int dev_id) {
+MXNetPredict::MXNetPredict(QString pathPrefix, DevType dt, int dev_id) {
     auto symbolName = "Inception-BN-symbol.json";
     auto paramName = "Inception-BN-0126.params";
 
@@ -73,8 +72,7 @@ Predictor::Predictor(QString pathPrefix, DevType dt, int dev_id) {
     this->dev_id = dev_id;
 }
 
-
-std::vector<std::pair<float,QString>> Predictor::getPredictions(std::vector<mx_float> image_data, int n) {
+std::vector<std::pair<float,QString>> MXNetPredict::getPredictions(std::vector<mx_float> image_data, int n) {
     mx_uint num_input_nodes = 1;  // 1 for feedforward
     const char* input_key[1] = {"data"};
     const char** input_keys = input_key;

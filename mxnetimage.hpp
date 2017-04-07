@@ -1,5 +1,5 @@
-#ifndef IMAGE_HPP
-#define IMAGE_HPP
+#ifndef MXNETIMAGE_H
+#define MXNETIMAGE_H
 
 #include <mxnet/c_predict_api.h>
 #include <opencv2/opencv.hpp>
@@ -7,7 +7,9 @@
 #include <QString>
 #include <vector>
 
-class MyImage {
+#include "mxnet_predict_global.hpp"
+
+class MXNET_PREDICTSHARED_EXPORT MyImage {
 public:
     MyImage(): DEFAULT_MEAN(117.0) {}
     std::vector<mx_float> processImage(QString path);
@@ -21,4 +23,4 @@ private:
     const mx_float DEFAULT_MEAN;
 };
 
-#endif // IMAGE_HPP
+#endif // MXNETIMAGE_H

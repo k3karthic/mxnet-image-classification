@@ -1,18 +1,20 @@
-#ifndef PREDICTOR_HPP
-#define PREDICTOR_HPP
+#ifndef MXNETPREDICT_H
+#define MXNETPREDICT_H
 
 #include <mxnet/c_predict_api.h>
 #include <QByteArray>
 #include <QString>
 #include <vector>
 
-#include <myimage.hpp>
+#include "mxnet_predict_global.hpp"
+#include "mxnetimage.hpp"
 
 enum class DevType { cpu, gpu };
 
-class Predictor {
+class MXNET_PREDICTSHARED_EXPORT MXNetPredict
+{
 public:
-    Predictor(QString pathPrefix, DevType dt, int dev_id);
+    MXNetPredict(QString pathPrefix, DevType dt, int dev_id);
     std::vector<std::pair<float,QString>> getPredictions(std::vector<mx_float> image_data, int n);
 private:
     QByteArray symbolFile;
@@ -20,10 +22,6 @@ private:
     std::vector<QString> synsets;
     int dev_type;
     int dev_id;
-    mx_uint num_input_nodes;
-    char** input_keys;
-    mx_uint input_shape_indptr[2];
-    mx_uint input_shape_data[4];
 };
 
-#endif // PREDICTOR_HPP
+#endif // MXNETPREDICT_H
