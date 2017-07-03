@@ -5,3 +5,7 @@
 /src/release
 /tests/debug
 /tests/release
+
+.qmake.stash
+*~
+**/*.pro.user*

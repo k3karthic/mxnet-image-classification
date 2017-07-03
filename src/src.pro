@@ -40,16 +40,16 @@ unix {
 
 ## Link MXNet library
 
-unix|win32: LIBS += -L$$PWD/../../3rdparty/mxnet/lib/ -llibmxnet
+unix|win32: LIBS += -L$(MXNET_HOME)/lib -llibmxnet
 
-INCLUDEPATH += $$PWD/../../3rdparty/mxnet/include
-DEPENDPATH += $$PWD/../../3rdparty/mxnet/include
+INCLUDEPATH += $(MXNET_HOME)/include
+DEPENDPATH += $(MXNET_HOME)/include
 
 ## Link OpenCV library
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../3rdparty/opencv/build/x64/vc14/lib/ -lopencv_core2413 -lopencv_highgui2413 -lopencv_imgproc2413
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../3rdparty/opencv/build/x64/vc14/lib/ -lopencv_core2413d -lopencv_highgui2413d -lopencv_imgproc2413d
-else:unix: LIBS += -L$$PWD/../../3rdparty/opencv/build/x64/vc14/lib/ -lopencv_core2413 -lopencv_highgui2413 -lopencv_imgproc2413
+win32:CONFIG(release, debug|release): LIBS += -L$(OPENCV_HOME)/build/x64/vc14/lib -lopencv_world320
+else:win32:CONFIG(debug, debug|release): LIBS += -L$(OPENCV_HOME)/build/x64/vc14/lib -lopencv_world320d
+else:unix: LIBS += -lopencv_world320
 
-INCLUDEPATH += $$PWD/../../3rdparty/opencv/build/include
-DEPENDPATH += $$PWD/../../3rdparty/opencv/build/include
+INCLUDEPATH += $(OPENCV_HOME)/build/include
+DEPENDPATH += $(OPENCV_HOME)/build/include
