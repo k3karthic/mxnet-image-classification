@@ -14,10 +14,13 @@ enum class DevType { cpu, gpu };
 class MXNET_PREDICTSHARED_EXPORT MXNetPredict {
 public:
   MXNetPredict(QString pathPrefix, DevType dt, int dev_id);
+  ~MXNetPredict();
+  void loadModel();
   std::vector<std::pair<float, QString>>
   getPredictions(std::vector<mx_float> image_data, int n);
 
 private:
+  PredictorHandle handle;
   QByteArray symbolFile;
   QByteArray paramFile;
   std::vector<QString> synsets;

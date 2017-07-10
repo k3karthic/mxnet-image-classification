@@ -72,8 +72,9 @@ MXNetPredict::MXNetPredict(QString pathPrefix, DevType dt, int dev_id) {
   this->dev_id = dev_id;
 }
 
-std::vector<std::pair<float, QString>>
-MXNetPredict::getPredictions(std::vector<mx_float> image_data, int n) {
+MXNetPredict::~MXNetPredict() { MXPredFree(this->handle); }
+
+void MXNetPredict::loadModel() {
   mx_uint num_input_nodes = 1; // 1 for feedforward
   const char *input_key[1] = {"data"};
   const char **input_keys = input_key;
@@ -91,13 +92,18 @@ MXNetPredict::getPredictions(std::vector<mx_float> image_data, int n) {
 
   assert(handle);
 
+  this->handle = handle;
+}
+
+std::vector<std::pair<float, QString>>
+MXNetPredict::getPredictions(std::vector<mx_float> image_data, int n) {
   mx_uint output_index = 0;
   mx_uint *shape = 0;
   mx_uint shape_len;
 
-  MXPredSetInput(handle, "data", image_data.data(), MyImage::size);
-  MXPredForward(handle);
-  MXPredGetOutputShape(handle, output_index, &shape, &shape_len);
+  MXPredSetInput(this->handle, "data", image_data.data(), MyImage::size);
+  MXPredForward(this->handle);
+  MXPredGetOutputShape(this->handle, output_index, &shape, &shape_len);
 
   size_t size = 1;
   for (mx_uint i = 0; i < shape_len; ++i) {
@@ -107,7 +113,6 @@ MXNetPredict::getPredictions(std::vector<mx_float> image_data, int n) {
   std::vector<float> data(size);
 
   MXPredGetOutput(handle, output_index, &(data[0]), size);
-  MXPredFree(handle);
 
   auto result = std::vector<std::pair<float, QString>>(n);
 
